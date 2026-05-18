@@ -22,18 +22,37 @@ Gemini CLI？JSON 文件，随便看。
 
 ## 各家 AI 编程工具聊天记录存储方式对比
 
-| 工具 | 存储位置 | 格式 | 加密 | 读取难度 |
+### 国际工具
+
+| 工具 | 存储位置 | 格式 | 加密 | 参考文档 |
 |------|----------|------|------|----------|
-| **Claude Code** | `~/.claude/projects/` | JSONL | ❌ 无 | 直接读取 |
-| **Cursor** | `workspaceStorage/` | SQLite | ❌ 无 | 直接查询 |
-| **Windsurf** | `workspaceStorage/` | SQLite | ❌ 无 | 直接查询 |
-| **Gemini CLI** | `~/.gemini/tmp/` | JSON | ❌ 无 | 直接读取 |
-| **Codex** | `~/.codex/sessions/` | JSONL | ⚠️ 部分 | 需解析 |
-| **Trae CN** | `ModularData/ai-agent/` | SQLite | ✅ SQLCipher 4 | 需逆向破解 |
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `~/.claude/projects/` | JSONL | ❌ 无 | [会话文件格式](https://lin-guanguo.github.io/llm-memory-research/agent-cli/agent-files-analysis/) |
+| [Cursor](https://cursor.com) | `workspaceStorage/` | SQLite | ❌ 无 | [导出工具](https://github.com/michaeldhood/cursor_chats) |
+| [Windsurf](https://windsurf.com) | `workspaceStorage/` | SQLite | ❌ 无 | [Chat导出](https://github.com/Exafunction/codeium/issues/127) |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `~/.gemini/tmp/` | JSON | ❌ 无 | [会话文件分析](https://lin-guanguo.github.io/llm-memory-research/agent-cli/agent-files-analysis/) |
+| [Codex](https://github.com/openai/codex) | `~/.codex/sessions/` | JSONL | ⚠️ 部分 | [压缩摘要加密](https://lin-guanguo.github.io/llm-memory-research/agent-cli/agent-files-analysis/) |
 
-**只有 Trae CN 对整个数据库进行了 SQLCipher 4 加密。**
+### 国内工具
 
-其他工具要么完全不加密，要么只加密部分内容（如 Codex 的压缩摘要）。
+| 工具 | 存储位置 | 格式 | 加密 | 参考文档 |
+|------|----------|------|------|----------|
+| [Trae CN](https://www.trae.ai) | `ModularData/ai-agent/` | SQLite | ✅ SQLCipher 4 | 本文 |
+| [CodeBuddy](https://www.codebuddy.cn) | 云端存储 | 云端 | ⚠️ 企业级加密 | [官方文档](https://www.codebuddy.ai/docs/ide/User-guide/History) |
+| [通义灵码](https://lingma.aliyun.com) | VS Code 本地 | 本地文件 | ⚠️ VS Code 级别 | [导出工具](https://github.com/dingdinglz/lingma-export) |
+| [MarsCode](https://www.marscode.cn) | VS Code 本地 | 本地文件 | ⚠️ VS Code 级别 | [官方文档](https://www.marscode.cn) |
+
+### 关键发现
+
+**只有 Trae CN 对本地数据库进行了完整的 SQLCipher 4 加密。**
+
+其他工具的存储方式：
+- **Claude Code**：明文 JSONL，直接可读
+- **Cursor/Windsurf**：明文 SQLite，直接查询
+- **Gemini CLI**：明文 JSON，直接读取
+- **Codex**：仅压缩摘要加密，其他明文
+- **国内工具**：多数使用 VS Code 本地存储或云端存储，未对本地数据进行强加密
+
+Trae CN 是唯一一个在本地存储中使用 SQLCipher 4 加密的 AI 编程工具。
 
 ---
 

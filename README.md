@@ -4,16 +4,26 @@
 
 ## 为什么需要这个工具？
 
+### 国际工具
+
 | 工具 | 存储格式 | 加密 | 读取难度 |
 |------|----------|------|----------|
-| Claude Code | JSONL | ❌ 无 | 直接读取 |
-| Cursor | SQLite | ❌ 无 | 直接查询 |
-| Windsurf | SQLite | ❌ 无 | 直接查询 |
-| Gemini CLI | JSON | ❌ 无 | 直接读取 |
-| Codex | JSONL | ⚠️ 部分 | 需解析 |
-| **Trae CN** | **SQLite** | **✅ SQLCipher 4** | **需逆向破解** |
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | JSONL | ❌ 无 | 直接读取 |
+| [Cursor](https://cursor.com) | SQLite | ❌ 无 | 直接查询 |
+| [Windsurf](https://windsurf.com) | SQLite | ❌ 无 | 直接查询 |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | JSON | ❌ 无 | 直接读取 |
+| [Codex](https://github.com/openai/codex) | JSONL | ⚠️ 部分 | 需解析 |
 
-**只有 Trae CN 对整个数据库进行了加密。**
+### 国内工具
+
+| 工具 | 存储格式 | 加密 | 读取难度 |
+|------|----------|------|----------|
+| **Trae CN** | **SQLite** | **✅ SQLCipher 4** | **需逆向破解** |
+| [CodeBuddy](https://www.codebuddy.cn) | 云端 | ⚠️ 企业级 | 需 API |
+| [通义灵码](https://lingma.aliyun.com) | VS Code 本地 | ⚠️ VS Code 级别 | 直接查询 |
+| [MarsCode](https://www.marscode.cn) | VS Code 本地 | ⚠️ VS Code 级别 | 直接查询 |
+
+**只有 Trae CN 对整个本地数据库进行了 SQLCipher 4 加密。**
 
 ## 功能
 

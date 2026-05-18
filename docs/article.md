@@ -34,23 +34,25 @@ Gemini CLI？JSON 文件，随便看。
 
 ### 国内工具
 
-| 工具 | 存储位置 | 格式 | 加密 | 参考文档 |
-|------|----------|------|------|----------|
-| [Trae CN](https://www.trae.ai) | `ModularData/ai-agent/` | SQLite | ✅ SQLCipher 4 | 本文 |
-| [CodeBuddy](https://www.codebuddy.cn) | 云端存储 | 云端 | ⚠️ 企业级加密 | [官方文档](https://www.codebuddy.ai/docs/ide/User-guide/History) |
-| [通义灵码](https://lingma.aliyun.com) | VS Code 本地 | 本地文件 | ⚠️ VS Code 级别 | [导出工具](https://github.com/dingdinglz/lingma-export) |
-| [MarsCode](https://www.marscode.cn) | VS Code 本地 | 本地文件 | ⚠️ VS Code 级别 | [官方文档](https://www.marscode.cn) |
+| 工具 | 存储方式 | 加密 | 说明 |
+|------|----------|------|------|
+| [**Trae CN**](https://www.trae.ai) | 本地 SQLite | ✅ SQLCipher 4 | 唯一强加密本地数据库 |
+| [CodeBuddy CN](https://www.codebuddy.cn) | 浏览器会话 | ❌ 无 | 会话不持久化，重启后消失 |
+| [CodeBuddy IDE](https://www.codebuddy.ai) | 本地存储 | ⚠️ 未知 | 支持导出，格式未公开 |
+| [通义灵码](https://lingma.aliyun.com) | VS Code 本地 | ⚠️ VS Code 级别 | [导出工具](https://github.com/dingdinglz/lingma-export) |
+| [MarsCode](https://www.marscode.cn) | VS Code 本地 | ⚠️ VS Code 级别 | [官方文档](https://www.marscode.cn) |
 
 ### 关键发现
 
-**只有 Trae CN 对本地数据库进行了完整的 SQLCipher 4 加密。**
+**只有 Trae CN 对整个本地数据库进行了 SQLCipher 4 加密。**
 
 其他工具的存储方式：
 - **Claude Code**：明文 JSONL，直接可读
 - **Cursor/Windsurf**：明文 SQLite，直接查询
 - **Gemini CLI**：明文 JSON，直接读取
 - **Codex**：仅压缩摘要加密，其他明文
-- **国内工具**：多数使用 VS Code 本地存储或云端存储，未对本地数据进行强加密
+- **CodeBuddy CN**：会话不持久化，重启后消失
+- **通义灵码/MarsCode**：VS Code 本地存储，未对本地数据进行强加密
 
 Trae CN 是唯一一个在本地存储中使用 SQLCipher 4 加密的 AI 编程工具。
 

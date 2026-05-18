@@ -16,12 +16,13 @@
 
 ### 国内工具
 
-| 工具 | 存储格式 | 加密 | 读取难度 |
-|------|----------|------|----------|
-| **Trae CN** | **SQLite** | **✅ SQLCipher 4** | **需逆向破解** |
-| [CodeBuddy](https://www.codebuddy.cn) | 云端 | ⚠️ 企业级 | 需 API |
-| [通义灵码](https://lingma.aliyun.com) | VS Code 本地 | ⚠️ VS Code 级别 | 直接查询 |
-| [MarsCode](https://www.marscode.cn) | VS Code 本地 | ⚠️ VS Code 级别 | 直接查询 |
+| 工具 | 存储方式 | 加密 | 说明 |
+|------|----------|------|------|
+| [**Trae CN**](https://www.trae.ai) | 本地 SQLite | ✅ SQLCipher 4 | 唯一强加密本地数据库 |
+| [CodeBuddy CN](https://www.codebuddy.cn) | 浏览器会话 | ❌ 无 | 会话不持久化，重启后消失 |
+| [CodeBuddy IDE](https://www.codebuddy.ai) | 本地存储 | ⚠️ 未知 | 支持导出，格式未公开 |
+| [通义灵码](https://lingma.aliyun.com) | VS Code 本地 | ⚠️ VS Code 级别 | [导出工具](https://github.com/dingdinglz/lingma-export) |
+| [MarsCode](https://www.marscode.cn) | VS Code 本地 | ⚠️ VS Code 级别 | [官方文档](https://www.marscode.cn) |
 
 **只有 Trae CN 对整个本地数据库进行了 SQLCipher 4 加密。**
 

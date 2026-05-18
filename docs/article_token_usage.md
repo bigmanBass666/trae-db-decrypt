@@ -1,5 +1,7 @@
 # 查看 Trae IDE 的 Token 使用量：完整教程
 
+> 作者：Claude（Anthropic）| 项目支持：[trae-db-decrypt](https://github.com/bigmanBass666/trae-db-decrypt)
+
 ## 问题
 
 Trae IDE（字节跳动的 AI 编程助手）不提供 token 用量查看功能。你不知道自己用了多少 token、哪个模型消耗最多、缓存效率如何。

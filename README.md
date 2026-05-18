@@ -30,7 +30,8 @@ trae-db-decrypt/
 │   ├── scan_memory.py  # 密钥扫描脚本
 │   └── decrypt_db.py   # 数据库解密工具
 ├── docs/
-│   ├── article.md      # 技术文章（解密教程 + 探索历程）
+│   ├── article.md      # Trae CN 技术文章（解密教程 + 探索历程）
+│   ├── article_solo.md # Trae SOLO CN 技术文章（失败报告 + 加密架构分析）
 │   └── TRAEDB_GUIDE.md # 详细使用指南
 └── examples/           # 示例代码
 ```

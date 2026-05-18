@@ -364,13 +364,56 @@ hex_re = re.compile(rb"x'([0-9a-fA-F]{64,192})'")
 2. 用 SQLCipher CLI 或 Python 读取数据库
 3. 从 `history_v2` 表导出对话记录
 
+### 数据库表结构
+
+解密后发现数据库包含 **39 张表**，核心数据：
+
+#### 核心对话表
+
+| 表名 | 行数 | 内容说明 |
+|------|------|----------|
+| `history_v2` | 15,914 | **完整聊天内容**（JSON格式，包含用户消息和AI回复） |
+| `chat_session` | 238 | 会话列表（含标题、类型、创建时间） |
+| `chat_message` | 3,048 | 消息元数据（关联会话和消息） |
+| `chat_turn` | 1,527 | 对话轮次（含agent类型、状态、引用） |
+
+#### Agent 相关表
+
+| 表名 | 行数 | 内容说明 |
+|------|------|----------|
+| `agent` | 17 | Agent定义（含system prompt、描述、工具列表） |
+| `agent_run` | 1,689 | Agent运行记录（含session、状态、token使用） |
+| `agent_member_relation` | 28 | Agent成员关系 |
+
+#### 任务/项目表
+
+| 表名 | 行数 | 内容说明 |
+|------|------|----------|
+| `task` | 1,424 | 任务记录（含session、状态、时间） |
+| `project` | 23 | 项目信息（含路径、创建时间） |
+| `todo_list` | 1,739 | 待办事项（JSON格式，含任务列表） |
+| `history_todo_list` | 1,739 | 历史待办记录 |
+
+#### 配置/缓存表
+
+| 表名 | 行数 | 内容说明 |
+|------|------|----------|
+| `server_history_info` | 32,692 | 服务器历史信息（含完整消息、工作区） |
+| `session_project` | 238 | 会话-项目关联 |
+| `model_config_cache` | 42 | 模型配置缓存 |
+| `mcp_server_agent_relation` | 58 | MCP服务器-Agent关联 |
+| `rules_attachment` | 744 | 规则附件 |
+| `user_configuration` | 2 | 用户配置 |
+| `multi_root_path` | 15 | 多根路径配置 |
+
+#### 重要发现
+
+1. **`history_v2`** 是最重要的表，包含完整对话内容（JSON格式）
+2. **`agent`** 表存储了所有自定义Agent的system prompt
+3. **`todo_list`** 包含JSON格式的待办事项列表
+4. **`server_history_info`** 有32,692行，包含服务器端的完整消息记录
+
 ### 关键文件
-
-- `scan_memory.py` - 密钥扫描脚本
-- `decrypted_key.json` - 提取的密钥
-- `database.db` - 加密的数据库
-
-### 参考项目
 
 - [wechat-decrypt](https://github.com/ylytdeng/wechat-decrypt) - 微信数据库解密项目（主要参考）
 

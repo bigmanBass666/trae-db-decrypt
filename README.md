@@ -1,6 +1,19 @@
 # Trae CN Database Decryptor
 
-> 🔓 从 Trae CN IDE 提取并解密 AI Agent 数据库
+> 🔓 Claude Code 聊天记录随便读，Trae CN 偏要加密——0.2 秒解密
+
+## 为什么需要这个工具？
+
+| 工具 | 存储格式 | 加密 | 读取难度 |
+|------|----------|------|----------|
+| Claude Code | JSONL | ❌ 无 | 直接读取 |
+| Cursor | SQLite | ❌ 无 | 直接查询 |
+| Windsurf | SQLite | ❌ 无 | 直接查询 |
+| Gemini CLI | JSON | ❌ 无 | 直接读取 |
+| Codex | JSONL | ⚠️ 部分 | 需解析 |
+| **Trae CN** | **SQLite** | **✅ SQLCipher 4** | **需逆向破解** |
+
+**只有 Trae CN 对整个数据库进行了加密。**
 
 ## 功能
 

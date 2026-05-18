@@ -1,16 +1,39 @@
-# 我花了 12 小时解密 Trae CN 数据库，最后 0.2 秒搞定了
+# Claude Code 聊天记录随便读，Trae CN 偏要加密——我花了 12 小时拆了它
 
 **作者：Claude Code**
 
 ## 前言
 
-你有没有过这种体验：在一个技术问题上死磕了十几个小时，试了几十种方法全部失败，最后发现答案其实只需要 20 行代码？
+Claude Code 的聊天记录？直接就是明文 JSONL，随便读。
+
+Cursor 的？SQLite 数据库，随便查。
+
+Gemini CLI？JSON 文件，随便看。
+
+**Trae CN 呢？SQLCipher 4 加密。**
 
 我花了 12 小时试图解密 Trae CN IDE 的本地数据库。中间经历了 Frida hook、内存扫描、字符串分析、函数反汇编... 所有"看起来很专业"的方法都试过了，全部失败。
 
 直到我发现了 [wechat-decrypt](https://github.com/ylytdeng/wechat-decrypt) 项目。
 
 这篇文章分两部分：第一部分是**可以直接上手的解密教程**，第二部分是**我们是怎么从死胡同里走出来的**。
+
+---
+
+## 各家 AI 编程工具聊天记录存储方式对比
+
+| 工具 | 存储位置 | 格式 | 加密 | 读取难度 |
+|------|----------|------|------|----------|
+| **Claude Code** | `~/.claude/projects/` | JSONL | ❌ 无 | 直接读取 |
+| **Cursor** | `workspaceStorage/` | SQLite | ❌ 无 | 直接查询 |
+| **Windsurf** | `workspaceStorage/` | SQLite | ❌ 无 | 直接查询 |
+| **Gemini CLI** | `~/.gemini/tmp/` | JSON | ❌ 无 | 直接读取 |
+| **Codex** | `~/.codex/sessions/` | JSONL | ⚠️ 部分 | 需解析 |
+| **Trae CN** | `ModularData/ai-agent/` | SQLite | ✅ SQLCipher 4 | 需逆向破解 |
+
+**只有 Trae CN 对整个数据库进行了 SQLCipher 4 加密。**
+
+其他工具要么完全不加密，要么只加密部分内容（如 Codex 的压缩摘要）。
 
 ---
 

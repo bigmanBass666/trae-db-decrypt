@@ -212,15 +212,39 @@ def scan_memory(h, regions, db_info, print_fn=print):
     return found_keys, candidates
 
 
+def find_database():
+    """自动检测 Trae CN database.db 路径"""
+    import argparse
+    import pathlib
+
+    default_paths = [
+        pathlib.Path(os.environ.get("APPDATA", "")) / "Trae CN" / "ModularData" / "ai-agent" / "database.db",
+    ]
+
+    # 尝试默认路径
+    for p in default_paths:
+        if p.exists():
+            return str(p)
+
+    return None
+
+
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Trae CN 数据库密钥扫描器")
+    parser.add_argument("-d", "--db-path", help="database.db 路径（默认自动检测）")
+    args = parser.parse_args()
+
     print("=" * 60)
     print("  Trae CN Database Key Scanner")
     print("  (Inspired by wechat-decrypt)")
     print("=" * 60)
 
-    db_path = "C:/Users/86150/AppData/Roaming/Trae CN/ModularData/ai-agent/database.db"
-    if not os.path.exists(db_path):
-        print(f"[!] Database not found: {db_path}")
+    db_path = args.db_path or find_database()
+    if not db_path or not os.path.exists(db_path):
+        print("[!] Database not found. Use -d to specify the path.")
+        print("    Expected: %APPDATA%/Trae CN/ModularData/ai-agent/database.db")
         sys.exit(1)
 
     db_info = load_database_info(db_path)
@@ -260,9 +284,10 @@ def main():
                 "enc_key": found_keys[0]["key"],
                 "address": found_keys[0]["addr"]
             }
-            with open("D:/Test/claude_test/subagent_test/decrypted_key.json", "w") as f:
+            out_path = os.path.join(os.getcwd(), "decrypted_key.json")
+            with open(out_path, "w") as f:
                 json.dump(result, f, indent=2)
-            print(f"[+] Key saved to decrypted_key.json")
+            print(f"[+] Key saved to {out_path}")
         elif candidates:
             print(f"\n[!] No verified keys found")
             for c in candidates[:10]:

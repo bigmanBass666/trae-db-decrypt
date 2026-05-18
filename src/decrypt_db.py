@@ -1,124 +1,105 @@
 """
-Trae CN 数据库解密工具
-使用提取的密钥解密 SQLCipher 数据库
+Trae CN database.db 解密器
+基于 wechat-decrypt 的页面级解密方法
+SQLCipher 4: AES-256-CBC, HMAC-SHA512, reserve=80, page_size=4096
+
+用法:
+  python src/decrypt_db.py                        # 使用默认路径
+  python src/decrypt_db.py -k decrypted_key.json  # 指定密钥文件
 """
-import sqlite3
-import sys
-import os
+import argparse
+import hashlib, hmac as hmac_mod, struct, os, sys, json, sqlite3
+from Crypto.Cipher import AES
 
-def decrypt_database(db_path, key):
-    """解密并读取数据库"""
-    if not os.path.exists(db_path):
-        print(f"[!] Database not found: {db_path}")
-        return None
-    
-    # 确保密钥格式正确
-    if not key.startswith("x'"):
-        key = f"x'{key}'"
-    if not key.endswith("'"):
-        key = f"{key}'"
-    
-    try:
-        db = sqlite3.connect(db_path)
-        db.execute(f"PRAGMA key = '{key}'")
-        
-        # 测试连接
-        result = db.execute("SELECT count(*) FROM sqlite_master").fetchone()
-        if result:
-            print(f"[+] Database decrypted successfully!")
-            print(f"[+] Found {result[0]} tables")
-            return db
-        else:
-            print("[!] Failed to decrypt database")
-            db.close()
-            return None
-    except Exception as e:
-        print(f"[!] Error: {e}")
-        return None
+PAGE_SZ = 4096
+KEY_SZ = 32
+SALT_SZ = 16
+IV_SZ = 16
+HMAC_SZ = 64
+RESERVE_SZ = 80
+SQLITE_HDR = b'SQLite format 3\x00'
 
-def list_tables(db):
-    """列出所有表"""
-    tables = db.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
-    print(f"\n[=] Tables ({len(tables)}):")
-    for t in tables:
-        count = db.execute(f"SELECT count(*) FROM [{t[0]}]").fetchone()[0]
-        print(f"  - {t[0]}: {count} rows")
+# 默认路径（可通过命令行参数覆盖）
+DEFAULT_DB_SRC = "C:/Users/86150/AppData/Roaming/Trae CN/ModularData/ai-agent/database.db"
+DEFAULT_KEY_FILE = "decrypted_key.json"
+DEFAULT_OUT_DB = "database_decrypted.db"
 
-def export_sessions(db, output_file="sessions.json"):
-    """导出会话数据"""
-    import json
-    
-    sessions = db.execute("""
-        SELECT s.session_id, s.session_title, s.session_type,
-               s.created_at, s.updated_at
-        FROM chat_session s
-        ORDER BY s.created_at DESC
-    """).fetchall()
-    
-    result = []
-    for s in sessions:
-        # 获取该会话的历史记录
-        history = db.execute("""
-            SELECT messages, agent_type, token_usage, created_at
-            FROM history_v2
-            WHERE session_id = ?
-            ORDER BY created_at
-        """, (s[0],)).fetchall()
-        
-        messages = []
-        for h in history:
-            if h[0]:
-                try:
-                    msg_data = json.loads(h[0])
-                    if 'raw_messages' in msg_data:
-                        for msg in msg_data['raw_messages']:
-                            role = msg.get('role', '')
-                            content = msg.get('content', [])
-                            text = ' '.join([p.get('text', '') for p in content if p.get('type') == 'text'])
-                            if text:
-                                messages.append({
-                                    'role': role,
-                                    'content': text,
-                                    'agent_type': h[1],
-                                    'timestamp': h[3]
-                                })
-                except:
-                    pass
-        
-        result.append({
-            'session_id': s[0],
-            'title': s[1],
-            'type': s[2],
-            'created_at': s[3],
-            'messages': messages
-        })
-    
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
-    
-    print(f"[+] Exported {len(result)} sessions to {output_file}")
+
+def derive_mac_key(enc_key, salt):
+    mac_salt = bytes(b ^ 0x3a for b in salt)
+    return hashlib.pbkdf2_hmac("sha512", enc_key, mac_salt, 2, dklen=KEY_SZ)
+
+
+def decrypt_page(enc_key, page_data, pgno):
+    iv = page_data[PAGE_SZ - RESERVE_SZ : PAGE_SZ - RESERVE_SZ + IV_SZ]
+    if pgno == 1:
+        encrypted = page_data[SALT_SZ : PAGE_SZ - RESERVE_SZ]
+        cipher = AES.new(enc_key, AES.MODE_CBC, iv)
+        decrypted = cipher.decrypt(encrypted)
+        return bytes(bytearray(SQLITE_HDR + decrypted + b'\x00' * RESERVE_SZ))
+    else:
+        encrypted = page_data[:PAGE_SZ - RESERVE_SZ]
+        cipher = AES.new(enc_key, AES.MODE_CBC, iv)
+        decrypted = cipher.decrypt(encrypted)
+        return decrypted + b'\x00' * RESERVE_SZ
+
 
 def main():
-    if len(sys.argv) < 3:
-        print("Usage: python decrypt_db.py <database.db> <key>")
-        print("")
-        print("Example:")
-        print('  python decrypt_db.py database.db "x\'3605...\'"')
-        sys.exit(1)
-    
-    db_path = sys.argv[1]
-    key = sys.argv[2]
-    
-    db = decrypt_database(db_path, key)
-    if db:
-        list_tables(db)
-        
-        # 询问是否导出
-        response = input("\nExport sessions to JSON? (y/n): ")
-        if response.lower() == 'y':
-            export_sessions(db)
-        
-        db.close()
+    parser = argparse.ArgumentParser(description="Trae CN database.db 解密器")
+    parser.add_argument("-k", "--key-file", default=DEFAULT_KEY_FILE, help="密钥文件路径")
+    parser.add_argument("-d", "--db-path", default=DEFAULT_DB_SRC, help="加密数据库路径")
+    parser.add_argument("-o", "--output", default=DEFAULT_OUT_DB, help="输出解密数据库路径")
+    args = parser.parse_args()
 
-if __name__ == "__main__":
+    with open(args.key_file) as f:
+        key_data = json.load(f)
+
+    enc_key = bytes.fromhex(key_data["enc_key"])
+    print(f"密钥: {key_data['enc_key'][:16]}...")
+    print(f"源数据库: {args.db_path} ({os.path.getsize(args.db_path)/1024/1024:.1f}MB)")
+
+    with open(args.db_path, 'rb') as f:
+        page1 = f.read(PAGE_SZ)
+
+    salt = page1[:SALT_SZ]
+    print(f"Salt: {salt.hex()}")
+
+    # HMAC 验证
+    mac_key = derive_mac_key(enc_key, salt)
+    p1_hmac_data = page1[SALT_SZ : PAGE_SZ - RESERVE_SZ + IV_SZ]
+    p1_stored_hmac = page1[PAGE_SZ - HMAC_SZ : PAGE_SZ]
+    hm = hmac_mod.new(mac_key, p1_hmac_data, hashlib.sha512)
+    hm.update(struct.pack('<I', 1))
+    if hm.digest() != p1_stored_hmac:
+        print("HMAC 验证失败!")
+        sys.exit(1)
+    print("HMAC 验证通过!")
+
+    # 解密全部页面
+    file_size = os.path.getsize(args.db_path)
+    total_pages = file_size // PAGE_SZ
+    print(f"共 {total_pages} 页，开始解密...")
+
+    with open(args.db_path, 'rb') as fin, open(args.output, 'wb') as fout:
+        for pgno in range(1, total_pages + 1):
+            page = fin.read(PAGE_SZ)
+            if len(page) < PAGE_SZ:
+                page = page + b'\x00' * (PAGE_SZ - len(page))
+            fout.write(decrypt_page(enc_key, page, pgno))
+            if pgno % 10000 == 0:
+                print(f"  进度: {pgno}/{total_pages} ({100*pgno/total_pages:.1f}%)")
+
+    print(f"解密完成: {args.output}")
+
+    # 验证
+    conn = sqlite3.connect(args.output)
+    tables = [r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+    print(f"表数量: {len(tables)}")
+    for t in tables:
+        count = conn.execute(f'SELECT count(*) FROM "{t}"').fetchone()[0]
+        print(f"  {t}: {count} 行")
+    conn.close()
+
+
+if __name__ == '__main__':
     main()

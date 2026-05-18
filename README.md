@@ -1,30 +1,6 @@
 # Trae CN Database Decryptor
 
-> 🔓 Claude Code 聊天记录随便读，Trae CN 偏要加密——0.2 秒解密
-
-## 为什么需要这个工具？
-
-### 国际工具
-
-| 工具 | 存储格式 | 加密 | 读取难度 |
-|------|----------|------|----------|
-| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | JSONL | ❌ 无 | 直接读取 |
-| [Cursor](https://cursor.com) | SQLite | ❌ 无 | 直接查询 |
-| [Windsurf](https://windsurf.com) | SQLite | ❌ 无 | 直接查询 |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | JSON | ❌ 无 | 直接读取 |
-| [Codex](https://github.com/openai/codex) | JSONL | ⚠️ 部分 | 需解析 |
-
-### 国内工具
-
-| 工具 | 存储方式 | 加密 | 说明 |
-|------|----------|------|------|
-| [**Trae CN**](https://www.trae.ai) | 本地 SQLite | ✅ SQLCipher 4 | 唯一强加密本地数据库 |
-| [CodeBuddy CN](https://www.codebuddy.cn) | 浏览器会话 | ❌ 无 | 会话不持久化，重启后消失 |
-| [CodeBuddy IDE](https://www.codebuddy.ai) | 本地存储 | ⚠️ 未知 | 支持导出，格式未公开 |
-| [通义灵码](https://lingma.aliyun.com) | VS Code 本地 | ⚠️ VS Code 级别 | [导出工具](https://github.com/dingdinglz/lingma-export) |
-| [MarsCode](https://www.marscode.cn) | VS Code 本地 | ⚠️ VS Code 级别 | [官方文档](https://www.marscode.cn) |
-
-**只有 Trae CN 对整个本地数据库进行了 SQLCipher 4 加密。**
+> 🔓 Trae CN SQLCipher 4 数据库解密工具 — 0.2 秒提取密钥
 
 ## 功能
 
@@ -54,6 +30,7 @@ trae-db-decrypt/
 │   ├── scan_memory.py  # 密钥扫描脚本
 │   └── decrypt_db.py   # 数据库解密工具
 ├── docs/
+│   ├── article.md      # 技术文章（解密教程 + 探索历程）
 │   └── TRAEDB_GUIDE.md # 详细使用指南
 └── examples/           # 示例代码
 ```
@@ -74,6 +51,8 @@ x'<64hex_enc_key><32hex_salt>'
 ```
 
 ## 数据库表结构
+
+解密后发现数据库包含 **39 张表**，核心数据：
 
 ### 核心对话表
 
@@ -112,14 +91,6 @@ x'<64hex_enc_key><32hex_salt>'
 | `rules_attachment` | 744 | 规则附件 |
 | `user_configuration` | 2 | 用户配置 |
 | `multi_root_path` | 15 | 多根路径配置 |
-
-### 系统表
-
-| 表名 | 行数 | 内容说明 |
-|------|------|----------|
-| `migration_sql_store` | 70 | 数据库迁移SQL |
-| `seaql_migrations` | 70 | SeaQL迁移记录 |
-| `sqlite_sequence` | 20 | SQLite序列 |
 
 ### 重要发现
 

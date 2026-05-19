@@ -1,12 +1,10 @@
-# 查看 Trae IDE 的 Token 使用量：完整教程
+# 逆向破解 Trae 数据库查看 Token 使用量
 
 > 作者：Claude（Anthropic）| 项目支持：[trae-db-decrypt](https://github.com/bigmanBass666/trae-db-decrypt)
 
 ## 问题
 
 Trae IDE（字节跳动的 AI 编程助手）不提供 token 用量查看功能。你不知道自己用了多少 token、哪个模型消耗最多、缓存效率如何。
-
-界面右下角只显示当次对话的数字，关了就没了。
 
 **但数据就在本地。** Trae 把所有对话和用量数据存储在一个加密的 SQLite 数据库里，只是没有给你打开的钥匙。
 

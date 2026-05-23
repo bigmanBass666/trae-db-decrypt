@@ -1,5 +1,11 @@
 # Trae CN Database Decryptor
 
+> 🌐 [Oh My Trae](https://github.com/bigmanBass666/oh-my-trae) 生态导航
+>
+> | 🔓 解密 | 💾 记忆 | 🛠️ 解锁 | 🤖 Solo |
+> |---------|---------|----------|---------|
+> | **trae-db-decrypt** | [trae-to-claude-mem](https://github.com/bigmanBass666/trae-to-claude-mem) | [trae-unlock](https://github.com/bigmanBass666/trae-unlock) | [trae-solo-unlock](https://github.com/bigmanBass666/trae-solo-unlock) |
+
 > Trae CN SQLCipher 4 数据库解密 + Token 使用量分析工具
 
 ## 功能
